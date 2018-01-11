@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * @file
+ * Contains rtd_ldap.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_help().
+ */
+function rtd_ldap_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the rtd_ldap module.
+    case 'help.page.rtd_ldap':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Provides LDAP tokens that can be used to prepopulate user account fields via CAS Attributes.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function rtd_ldap_form_cas_attributes_settings_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Load TreeBuilder service to be able to render a list of available tokens.
+  $token_tree_builder = \Drupal::service('token.tree_builder');
+
+  $form['field']['tokens_wrapper'] = [
+    '#title' => t('Available Tokens'),
+    '#type' => 'fieldset',
+    '#weight' => -100,
+    'tokens' => $token_tree_builder->buildRenderable(['rtd-ldap']),
+  ];
+
+}

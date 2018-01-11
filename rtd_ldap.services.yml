@@ -1,0 +1,7 @@
+services:
+  rtd_ldap.subscriber:
+    class: Drupal\rtd_ldap\Subscriber\RtdLdapSubscriber
+    public: false
+    decorates: cas_attributes.subscriber
+    decoration_priority: 3
+    arguments: ['@config.factory', '@token', '@request_stack', '@ldap.servers']
