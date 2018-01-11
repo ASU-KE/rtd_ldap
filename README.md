@@ -16,7 +16,7 @@ applicable to all users (i.e. students vs staff.
 ### Note:
 RTD LDAP was built as a replacement for the CAS LDAP module, which at the time of this writing did not have a
 Drupal 8 release. Should CAS LDAP have a Drupal 8 release, RTD LDAP will be discontinued in favor of CAS LDAP. Refer
-to [this ticket](https://www.drupal.org/project/cas_attributes/issues/2935811)) on drupal.org's issue queue to learn
+to [this ticket](https://www.drupal.org/project/cas_attributes/issues/2935811) on drupal.org's issue queue to learn
  more about the status of CAS LDAP.
 
 
