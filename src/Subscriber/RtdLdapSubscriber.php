@@ -61,6 +61,10 @@ class RtdLdapSubscriber extends CasAttributeSubscriber {
     ];
 
     foreach ($mappings as $field_name => $attribute_token) {
+      // $attribute_token must be a string. Skip iteration it's an array.
+      if (is_array($attribute_token)) {
+        continue;
+      }
       $result = trim($this->tokenService->replace($attribute_token, $token_data, ['clear' => TRUE]));
       $result = html_entity_decode($result);
 
