@@ -9,10 +9,5 @@
   "support": {
     "issues": "https://github.com/ASU-OKED-WEB-DEV/rtd_ldap/issues",
     "source": "https://github.com/ASU-OKED-WEB-DEV/rtd_ldap"
-  },
-  "require": {
-    "drupal/cas": "^1.0@RC",
-    "drupal/cas_attributes": "1.x-dev",
-    "drupal/ldap": "3.x-dev"
   }
 }
