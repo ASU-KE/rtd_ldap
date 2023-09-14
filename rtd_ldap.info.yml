@@ -1,7 +1,7 @@
 name: RTD LDAP
 type: module
 description: Provides LDAP tokens that can be used to prepopulate user account fields via CAS Attributes.
-core: 8.x
+core_version_requirement: ^8 || ^9
 package: RTD
 dependencies:
   - ldap:ldap_servers
