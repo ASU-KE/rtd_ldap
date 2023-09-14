@@ -5,7 +5,6 @@ core_version_requirement: ^8 || ^9
 package: RTD
 dependencies:
   - ldap:ldap_servers
-  - ldap:ldap_help
   - cas:cas
   - cas_attributes:cas_attributes
   - token:token
