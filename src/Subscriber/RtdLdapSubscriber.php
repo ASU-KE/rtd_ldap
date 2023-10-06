@@ -18,9 +18,9 @@ class RtdLdapSubscriber extends CasAttributesSubscriber {
   /**
    * LDAP Server service.
    *
-   * @var \Drupal\ldap_servers\ServerFactory
+   * @var \Drupal\ldap_servers\LdapUserManager
    */
-  protected $ldapServer;
+  protected $ldapServers;
 
   protected $username;
 
@@ -33,12 +33,12 @@ class RtdLdapSubscriber extends CasAttributesSubscriber {
    *   Token service.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   Symfony's RequestStack service.
-   * @param \Drupal\ldap_servers\ServerFactory $ldap
+   * @param \Drupal\ldap_servers\LdapUserManager $ldap
    *   LDAP server factory.
    */
   public function __construct(ConfigFactoryInterface $config_factory, Token $token_service, RequestStack $request_stack, LdapUserManager $ldap) {
     parent::__construct($config_factory, $token_service, $request_stack);
-    $this->ldapServer = $ldap;
+    $this->ldapServers = $ldap;
     $this->username = '';
   }
 
