@@ -2,7 +2,7 @@
 
 namespace Drupal\rtd_ldap\Subscriber;
 
-use Drupal\cas_attributes\Subscriber\CasAttributeSubscriber;
+use Drupal\cas_attributes\Subscriber\CasAttributesSubscriber;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Utility\Token;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -13,7 +13,7 @@ use Drupal\cas_attributes\Form\CasAttributesSettings;
 /**
  * Provides a RtdLdapSubscriber.
  */
-class RtdLdapSubscriber extends CasAttributeSubscriber {
+class RtdLdapSubscriber extends CasAttributesSubscriber {
 
   /**
    * LDAP Server service.
