@@ -6,7 +6,9 @@ use Drupal\cas_attributes\Subscriber\CasAttributeSubscriber;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Utility\Token;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Drupal\ldap_servers\ServerFactory;
+use Drupal\ldap_servers\LdapUserManager;
+use Drupal\cas\Event\CasPreLoginEvent;
+use Drupal\cas_attributes\Form\CasAttributesSettings;
 
 /**
  * Provides a RtdLdapSubscriber.
@@ -20,6 +22,8 @@ class RtdLdapSubscriber extends CasAttributeSubscriber {
    */
   protected $ldapServer;
 
+  protected $username;
+
   /**
    * RtdLdapSubscriber constructor.
    *
@@ -32,9 +36,45 @@ class RtdLdapSubscriber extends CasAttributeSubscriber {
    * @param \Drupal\ldap_servers\ServerFactory $ldap
    *   LDAP server factory.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, Token $token_service, RequestStack $request_stack, ServerFactory $ldap) {
+  public function __construct(ConfigFactoryInterface $config_factory, Token $token_service, RequestStack $request_stack, LdapUserManager $ldap) {
     parent::__construct($config_factory, $token_service, $request_stack);
     $this->ldapServer = $ldap;
+    $this->username = '';
+  }
+
+  public function onPreLogin(CasPreLoginEvent $event) {
+    $account = $event->getAccount();
+    $this->username = $event->getCasPropertyBag()->getUsername();
+
+    // Map fields.
+    if ($this->settings->get('field.sync_frequency') === CasAttributesSettings::SYNC_FREQUENCY_EVERY_LOGIN) {
+      $field_mappings = $this->getFieldMappings($event->getCasPropertyBag()->getAttributes());
+      if (!empty($field_mappings)) {
+        // If field already has data, only set new value if configured to
+        // overwrite existing data.
+        $overwrite = $this->settings->get('field.overwrite');
+        foreach ($field_mappings as $field_name => $field_value) {
+          if ($overwrite || empty($account->get($field_name))) {
+            $account->set($field_name, $field_value);
+          }
+        }
+      }
+    }
+
+    // Map roles.
+    $roleMappingResults = $this->doRoleMapCheck($event->getCasPropertyBag()->getAttributes());
+    if ($this->settings->get('role.sync_frequency') === CasAttributesSettings::SYNC_FREQUENCY_EVERY_LOGIN) {
+      foreach ($roleMappingResults['remove'] as $rid) {
+        $account->removeRole($rid);
+      }
+      foreach ($roleMappingResults['add'] as $rid) {
+        $account->addRole($rid);
+      }
+    }
+
+    if (empty($roleMappingResults['add']) && $this->settings->get('role.deny_login_no_match')) {
+      $event->cancelLogin();
+    }
   }
 
   /**
@@ -47,7 +87,8 @@ class RtdLdapSubscriber extends CasAttributeSubscriber {
    *   User account fields with with processed tokens.
    */
   protected function getFieldMappings() {
-    $mappings = unserialize($this->settings->get('field.field_mapping'));
+    $map = $this->settings;
+    $mappings = $this->settings->get('field.mappings');
     if (empty($mappings)) {
       return [];
     }
@@ -55,7 +96,7 @@ class RtdLdapSubscriber extends CasAttributeSubscriber {
     $field_data = [];
 
     // Add LDAP data.
-    $username = $this->getCasUsername();
+    $username = $this->username;
     $token_data = [
       'rtd_ldap' => $this->getLdapData($username),
     ];
@@ -65,7 +106,7 @@ class RtdLdapSubscriber extends CasAttributeSubscriber {
       if (is_array($attribute_token)) {
         continue;
       }
-      $result = trim($this->tokenService->replace($attribute_token, $token_data, ['clear' => TRUE]));
+      $result = trim($this->tokenService->replace($attribute_token, ['rtd_ldap' => $token_data], ['clear' => TRUE]));
       $result = html_entity_decode($result);
 
       // Only update the fields if there is data to set.
@@ -87,34 +128,15 @@ class RtdLdapSubscriber extends CasAttributeSubscriber {
    *   LDAP user data or false if no LDAP server is available.
    */
   protected function getLdapData($username) {
-    $ldap_servers = $this->ldapServer->getEnabledServers();
+    $ldap_server = $this->ldapServer->setServerById('asu_ldap');
     $ldap_entry = [];
 
-    if (!empty($ldap_servers) && !empty($username)) {
-      $ldap_server = array_shift($ldap_servers);
-      $ldap_entry = $ldap_server->matchUsernameToExistingLdapEntry($username);
+    if (!empty($ldap_server) && !empty($username)) {
+      $ldap_entry = $this->ldapServers->queryAllBaseDnLdapForUsername($username);
+      $ldap_entry = $ldap_entry->getAttributes();
     }
 
     return $ldap_entry;
-  }
-
-  /**
-   * Fetch cas username from current session.
-   *
-   * @return string|null
-   *   The cas username.
-   */
-  private function getCasUsername() {
-    $username = NULL;
-    $current_session = $this->requestStack->getCurrentRequest()->getSession();
-    $cas_property_bag_raw = $current_session->get('cas_attributes_properties');
-
-    if (!empty($cas_property_bag_raw)) {
-      $cas_property_bag = unserialize($cas_property_bag_raw);
-      $username = $cas_property_bag->getUsername();
-    }
-
-    return $username;
   }
 
 }

@@ -18,7 +18,7 @@ function rtd_ldap_token_info() {
     'needs-data' => 'rtd_ldap'
   ];
 
-  $rtd_ldap['givenname'] = [
+  $rtd_ldap['givenName'] = [
     'name' => "Given name",
     'description' => "LDAP: First name.",
   ];
@@ -57,8 +57,8 @@ function rtd_ldap_tokens($type, $tokens, array $data, array $options, Bubbleable
 
   if ($type == 'rtd-ldap' && isset($data['rtd_ldap'])) {
     foreach ($tokens as $token_key => $token) {
-      if (isset($data['rtd_ldap']['attr'][$token_key][0])) {
-        $replacements[$token] = $data['rtd_ldap']['attr'][$token_key][0];
+      if (isset($data['rtd_ldap']['rtd_ldap'][$token_key][0])) {
+        $replacements[$token] = $data['rtd_ldap']['rtd_ldap'][$token_key][0];
       }
     }
   }

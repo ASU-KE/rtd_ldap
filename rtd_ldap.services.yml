@@ -4,4 +4,4 @@ services:
     public: false
     decorates: cas_attributes.subscriber
     decoration_priority: 3
-    arguments: ['@config.factory', '@token', '@request_stack', '@ldap.servers']
+    arguments: ['@config.factory', '@token', '@request_stack', '@ldap.user_manager']
