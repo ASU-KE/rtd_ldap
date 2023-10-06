@@ -78,15 +78,15 @@ class RtdLdapSubscriber extends CasAttributesSubscriber {
   }
 
   /**
-   * Override method originally supplied by CasAttributeSubscriber.
+   * Override method originally supplied by CasAttributesSubscriber.
    *
    * The difference between this method and the original is that here
    * we pass token data to the token replace function call.
    *
-   * @return array
+   * @return array $casAttributes
    *   User account fields with with processed tokens.
    */
-  protected function getFieldMappings() {
+  protected function getFieldMappings(array $casAttributes) {
     $map = $this->settings;
     $mappings = $this->settings->get('field.mappings');
     if (empty($mappings)) {
