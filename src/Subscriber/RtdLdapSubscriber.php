@@ -128,7 +128,7 @@ class RtdLdapSubscriber extends CasAttributesSubscriber {
    *   LDAP user data or false if no LDAP server is available.
    */
   protected function getLdapData($username) {
-    $ldap_server = $this->ldapServer->setServerById('asu_ldap');
+    $ldap_server = $this->ldapServers->setServerById('asu_ldap');
     $ldap_entry = [];
 
     if (!empty($ldap_server) && !empty($username)) {
