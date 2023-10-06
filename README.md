@@ -1,4 +1,4 @@
-## RTD LDAP module for Drupal 8
+## RTD LDAP module for Drupal 8, 9 & 10
 
 ### Installation Instructions:
 1. Install and enable CAS, CAS Attributes, LDAP Servers, and LDAP Help modules.
